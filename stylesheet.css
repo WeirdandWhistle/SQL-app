@@ -1,0 +1,38 @@
+body {
+	background-color: #02000a;
+	color: WHITE;
+}
+div {
+	border: solid #3d444d 1px;
+	display: flex;
+	justify-content: center;
+	border-radius: 30px;
+}
+.main-box{
+	justify-content: space-evenly;
+	border: none;
+	flex-wrap: wrap;
+	row-gap: 20px;
+	column-gap: 5px;
+}
+.info-container{
+	min-height: 30rem;
+	width:25rem;
+	padding: 0.7rem;
+	display: grid;
+}
+.link-counter{
+	padding:0.5rem;
+	position: relative;
+	height: fit-content;
+	max-height: 20px;
+	align-items: center;
+	justify-content: center;
+	width: fit-content;
+	left: 50%;
+	translate: -50%;
+}
+.header-2{
+	font-size: 2rem;
+	font-weight: bold;
+}
