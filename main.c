@@ -47,7 +47,7 @@ int main(){
 		printf("%c",http_request[i]);
 	}
 
-	unsigned char out[] = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+	unsigned char out[] = "HTTP/1.1 307\r\nLocation: https://google.com\r\n\r\n";
 
 	//write(acc, http_request, http_request_length);
 	write(acc, out, sizeof(out));
