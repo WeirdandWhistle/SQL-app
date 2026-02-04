@@ -1,76 +1,94 @@
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <netinet/in.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "sqlite3.h"
 
 int main(){
 	
 	printf("MAIN runs!\n");
 
-	sqlite3 *db;
-	int rc;
+	int soc = socket(AF_INET, SOCK_STREAM, 0);
 
-	char cmd[] = "CREATE TABLE IF NOT EXISTS test_table (id INTEGER PRIMARY KEY, name TEXT NOT NULL);";
+	int opt = 1;
+	setsockopt(soc, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	
+	struct sockaddr_in my_addr;
+	my_addr.sin_family = AF_INET;
+	my_addr.sin_port = htons(2008);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	rc = sqlite3_open_v2("testdb.db", &db, SQLITE_OPEN_READWRITE, NULL);
-	if(rc){
-		printf("OPENING database failed!\n");
+	int binded = bind(soc, (struct sockaddr *)&my_addr, sizeof(my_addr));
+	if(binded<0){printf("bind error!\n"); return 1;}
+
+	listen(soc, 1);
+
+	struct sockaddr accept_addr;
+	socklen_t addrlen = sizeof(accept_addr);
+
+	printf("setup socket on port 2008 and ready read on acc\n");
+
+	int acc = accept(soc, &accept_addr, &addrlen);
+	if(acc<0){printf("accept error!\n"); return 1;}
+
+	
+	unsigned char *http_request = malloc(1000);
+	int http_request_length;
+
+	http_request_length = read(acc, http_request, 1000);
+
+	if(http_request_length < 0){
+		printf("OH SHIT! read failed!\n");
 		return 1;
 	}
-	
-	sqlite3_stmt *stmt;
 
-	sqlite3_prepare_v2(db, cmd, -1, &stmt, NULL);
-
-	rc = 1;
-
-	while(rc != SQLITE_DONE){
-		printf("RUNNING sql step! rc: %d\n", rc);
-		rc = sqlite3_step(stmt);		
+	for(int i = 0; i<http_request_length;i++){
+		printf("%c",http_request[i]);
 	}
-	printf("SQL exited!\n");
 
+	unsigned char out[] = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
 
-	sqlite3_finalize(stmt);
+	//write(acc, http_request, http_request_length);
+	write(acc, out, sizeof(out));
 
-	//sqlite3_reset(stmt);
-	
-	rc = sqlite3_prepare_v2(db, "INSERT INTO test_table ( name) VALUES ('Larry McPadderson');", -1, &stmt, NULL);
-	
-	printf("PREPARE rc: %d\n",rc);
+	unsigned char *endpoint = malloc(100);
+	int endpoint_length;
 
-	rc = 1;
+	unsigned char buf = http_request[0];
+	int recording = 0;
+	int out_index = 0;
+	int endpoint_index = 0;
 
-	while(rc != SQLITE_DONE){
-		printf("RUNNING sql step! rc: %d\n", rc);
-		rc = sqlite3_step(stmt);		
-	}
-	printf("SQL exited!\n");
+	while(buf != '\n'){
 
-
-	sqlite3_finalize(stmt);
-
-	
-	sqlite3_prepare_v2(db, "SELECT * FROM test_table;", -1, &stmt, NULL);
-
-	rc = 0;
-	while(rc != SQLITE_DONE){
-		rc = sqlite3_step(stmt);
-
-		if(rc == SQLITE_DONE){
+		//printf("up dated buf to ' %c'\n",buf);
+		if(recording && buf == ' '){
+			//printf("exited at out=%d and endpoint=%d\n",out_index,endpoint_index);
 			break;
 		}
+		if(recording){
+			//printf("adding %c at %d\n",http_request[out_index],endpoint_index);
+			endpoint[endpoint_index] = http_request[out_index];
+			endpoint_index++;
+		}
 
-		int col_count = sqlite3_column_count(stmt);
+		if(!recording && buf == ' '){
+			//printf("started recording at %d\n",out_index);
+			recording = 1;
+		}
 
-		int id = sqlite3_column_int(stmt, 0);
-		const unsigned char *name = sqlite3_column_text(stmt, 1);
+		out_index++;
+		buf = http_request[out_index];
 
-		printf("ENTRY [ID: %d| NAME: %s]\n",id,name);
-			
-		
 	}
-	
+	endpoint_length = endpoint_index;
 
-	sqlite3_close(db);
+	printf("endpoint lenght %d\n",endpoint_length);
+	printf("ENDPOINT: '%s'\n",endpoint);
+
+
+	free(http_request);
 
 	return 0;
 }
