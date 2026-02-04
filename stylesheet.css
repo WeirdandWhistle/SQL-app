@@ -7,30 +7,71 @@ div {
 	display: flex;
 	justify-content: center;
 	border-radius: 30px;
+	padding: 0.5rem;
 }
 .main-box{
-	justify-content: space-evenly;
+	justify-content: flex-start;
 	border: none;
 	flex-wrap: wrap;
 	row-gap: 20px;
-	column-gap: 5px;
+	column-gap: 30px;
 }
 .info-container{
-	min-height: 30rem;
+	min-height: 40rem;
 	width:25rem;
 	padding: 0.7rem;
 	display: grid;
+	grid-template-areas: "header header"
+			     "pannel1 pannel2"
+ 			     "pannel1 pannel2"
+ 			     "pannel1 pannel2"
+			     "pannel3 pannel4"
+			     "pannel3 pannel4"
+			     "pannel3 pannel4"
+			     "footer footer";
+	grid-gap: 1rem;
 }
-.link-counter{
-	padding:0.5rem;
+.create-link{
+	min-height: 40rem;
+	width: 25rem;
+	border-color: #7e0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #7e0;
+	font-size: 4rem;
+	transition: 0.5s;
+}
+.create-link:hover{
+	rotate: 5deg;
+	cursor: pointer;
+	background-color: #10101060;	
+}
+.info-desc{
+	display: flex;
+	justify-content: center;
 	position: relative;
-	height: fit-content;
-	max-height: 20px;
+	bottom: 30%;
+
+}
+.pannel-1{grid-area: pannel1;}
+.pannel-2{grid-area: pannel2;}
+.pannel-3{grid-area: pannel3;}
+.pannel-4{grid-area: pannel4;}
+.info-footer{grid-area: footer;}
+.link-counter{
+	padding-right: 1rem;
+	padding-left:1rem;
+	padding-top: 1rem;
+	position: relative;
+	max-height: 4rem;
 	align-items: center;
 	justify-content: center;
+	flex-direction: column;
 	width: fit-content;
 	left: 50%;
 	translate: -50%;
+	grid-area: header;
 }
 .header-2{
 	font-size: 2rem;
