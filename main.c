@@ -1,3 +1,4 @@
+#include <string.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -50,7 +51,7 @@ int main(){
 	unsigned char out[] = "HTTP/1.1 307\r\nLocation: https://google.com\r\n\r\n";
 
 	//write(acc, http_request, http_request_length);
-	write(acc, out, sizeof(out));
+	//write(acc, out, sizeof(out));
 
 	unsigned char *endpoint = malloc(100);
 	int endpoint_length;
@@ -87,8 +88,48 @@ int main(){
 	printf("endpoint lenght %d\n",endpoint_length);
 	printf("ENDPOINT: '%s'\n",endpoint);
 
+	unsigned char *letter_ptr;
+	unsigned char letter;
+
+	strtok(endpoint, "/");
+	letter_ptr = strtok(NULL, "/");
+	//letter_ptr = strtok(NULL, "/");
+	
+	if(letter_ptr == NULL){printf("nah Null!\n");return 1;}
+
+	letter = *letter_ptr;
+	
+	printf("letter '%c'\n",letter);
+
+
+	if(letter == 'r'){
+		printf("REDIRECT\n");
+	} else if(letter == 'm'){
+		printf("MAKE\n");
+
+
+	unsigned char *in = malloc(1000);
+	int in_length;
+
+	in_length = read(acc, in, 1000);
+
+	if(in_length < 0){
+		printf("OH SHIT! read failed!\n");
+		return 1;
+	}
+
+	for(int i = 0; i<in_length;i++){
+		printf("%c",in[i]);
+	}
+
+
+
+
+	}
+
 
 	free(http_request);
+	free(endpoint);
 
 	return 0;
 }
