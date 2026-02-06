@@ -92,5 +92,80 @@ div {
 
 }
 input[type=text]{
-	background-color: red;
+	background-color: transparent;
+	width: 50%;
+	height: 1.5rem;
+	outline: none;
+	box-shadow: none;
+	transition: 0.5s;
+	border: none;
+	z-index: 10;
+}
+.new-link label{
+	position: absolute;
+	top: 12rem;
+	left: calc(25% + 10px);
+	z-index: 9;
+	transition: 0.5s;
+}
+.new-link input:focus ~ label{
+	color: cyan;
+	translate: -10px -140%;
+}
+.new-link input:focus ~ i{
+	background-color: cyan;
+	height: 1.5rem;
+	top: 11.5rem;
+	
+}
+.new-link i{
+	background-color: white;
+	position: absolute;
+	width: 50%;
+	top: 13rem;
+	transition: 0.5s;
+	height: 0.25rem;
+	z-index:9;
+	border-radius: 10px;
+}
+.new-link input::placeholder {
+	color: transparent;
+}
+.new-link input:not(:placeholder-shown) ~ i{
+	background-color: cyan;
+	height: 1.5rem;
+	top: 11.5rem;
+}
+.new-link input:not(:placeholder-shown) ~ label {
+	color: cyan;
+	translate: -10px -140%;
+}
+.x{
+	position: absolute;
+	aspect-ratio: 1/1;
+	width: 5rem;
+	border-radius: 31%;
+	background-color: #ff1111cc;
+	display:flex;
+	align-items:center;
+	justify-content: center;
+	top: 0;
+	right: 0;
+	font-size: 2rem;
+	cursor: pointer;
+}
+.long-button{
+	width: 30%;
+	height: 1.5rem;
+
+	border-radius: 20px;
+	color: black;
+	background-color: cyan;
+	cursor: pointer;
+	border:none;
+	transition: 0.5s;	
+}
+.long-button:hover {
+	background-color: #00ffffa8;
+	transform: scale(1.1);
 }
