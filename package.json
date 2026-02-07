@@ -1,0 +1,13 @@
+{
+  "name": "sql-app",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "sql": "^0.78.0"
+  }
+}
