@@ -76,8 +76,12 @@ async function make(req){
 		url = new URL(body.des);
 		if(url.protocol === "http:" || url.protocol === "https:"){
 			let inBanned = false;
-			for(let ban in bannedURLs){
+			//let debug = -1;
+			for(let i = 0; i<bannedURLs.length;i++){
+				const ban = bannedURLs[i];
+				c//onsole.log(ban);
 				if(url.toString().includes(ban)){
+					//debug = url.toString().indexOf(ban);
 					inBanned = true;
 					break;
 				}
