@@ -3,3 +3,4 @@ sqlite3.h
 sqlite3.o
 main
 node_modules
+sql.db
