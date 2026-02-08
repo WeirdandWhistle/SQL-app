@@ -10,7 +10,7 @@
 
 		</div>
 		<hr>
-
+		<!--
 		<div class="main-box">
 			<div class="info-container">
 				<div class="link-counter">
@@ -26,17 +26,27 @@
 
 			</div>
 			<div class="create-link" onclick="createNewLink()">+</div>
-
+	
 		
 		</div>
-
-		<div class="new-link" id="URLForum">
-			new link form!
+		-->
+		<div class="new-link" id="URLForum" style="display:none">
+			New Link Forum!
 			<input id="url"class="input-field" type="text" placeholder="the css has not loaded yet... give it a sec... be paitnece"></input>
 			<label >Enter Text</label>
 			<i></i>
 			<span class="x" onclick="closeURLForum()">X</span>
 			<button class="long-button" onclick="makeURL()">Create New Link</button>
+
+		</div>
+
+		<div class="confirm" id="confirm" style="display: none">
+			<h2>New link sussecfuly created!</h2>
+			<p>You can find the link in your dashboard after you reload <b>or</b> right below (you can triple [3] click to copy)</p>
+			<div class="snippet">
+				YOU SHOULD NEVER SEE THIS
+			</div>
+			<span class="x" onclick="closeConfirm()">X</span>
 
 		</div>
 
