@@ -2,6 +2,8 @@ console.log("HELLO WORKING WORLD!");
 
 const URLforum = document.getElementById("URLforum");
 const urlInput = document.getElementById("url");
+const confirmForum = document.getElementById("confirm");
+const mainBox = document.getElementsByClassName("main-box")[0];
 
 function getCookie(name){
 	let cookie = document.cookie.split(";");
@@ -54,3 +56,43 @@ async function makeURL(){
 		body: JSON.stringify(send)
 	}));
 }
+function closeConfirm(){
+	confirmForum.style.display = 'none';
+}
+function openConfirm(){
+	confirmForum.style.display = 'flex';
+}
+
+async function init(){
+	await login();
+	const token = getCookie("token");
+	const prom = await fetch(`/api/info?token=${token}`);
+
+	const data = await prom.json();
+	for(let i = 0; i<data.entries.length; i++){
+		const entry = data.entries[i];
+
+		mainBox.insertAdjacentHTML("afterbegin", `
+			<div class="info-container">
+				<div class="link-counter">
+					<span class="header-2">${entry.count}</span>
+					<p class="info-desc">people clicked your link!</p>
+				</div>
+				<div class="pannel-1">
+					Where you redirect to:
+					<br>
+					<p>${entry.des}</p>
+				</div>	
+				<div class="pannel-2">
+					You're redirection link:
+					<br>
+					<p>${window.location.origin}/r/${entry.id}</p>
+				</div>	
+
+				<div class="info-footer">FOORTER!</div>			
+
+			</div>`);	
+	}
+}
+
+init();
