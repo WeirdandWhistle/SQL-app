@@ -27,11 +27,12 @@ function setCookie(name,value,days) {
     document.cookie = name + "=" + (value || "")  + expires + "; path=/";
 }
 async function login(){
+	console.log("logging in...");
 	if(getCookie("token") != null){
 		return;
 	}
 
-	console.log("logging in...");
+	document.cookie = '';
 	await fetch("/api/login");
 }
 function createNewLink(){
@@ -42,9 +43,14 @@ function closeURLForum(){
 	console.log("closing URL forum");
 	URLForum.style.display = "none";
 }
-function makeURL(){
+async function makeURL(){
 	const url = urlInput.value;
-	login();
+	await login();
 
-	//const
+	const send = {des:url, token: getCookie("token")};
+
+	console.log(await fetch("/api/make",{
+		method: 'POST',
+		body: JSON.stringify(send)
+	}));
 }
