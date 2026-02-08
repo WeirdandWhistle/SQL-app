@@ -140,7 +140,46 @@ async function login(req){
 	return res;
 }
 async function info(req) {
+
+	const url = new URL(req.url);
 	
+	const token = url.searchParams.get("token");
+	if(token == null){
+		console.log("token_null");
+		return new Response(JSON.stringify({ok:false,error:"token_null"}),{status:400});
+	}
+
+	if(token.length != 10){
+		console.log("token_wrong_length", token.length);
+		return new Response(null, {status:400,statusText:"token_wrong_length"});
+	}
+	let accpeted = true;
+	for(let c in token){
+		if(!chars.includes(c)){
+			accpeted = false;
+			break;
+		}
+	}
+	if(!accpeted){
+		console.log("token_chars_not_allowed");
+			return new Response(null,{status:401,statusText:"token_chars_not_allowed"});
+	}
+
+	const ret = await db`SELECT id, des, count FROM redirect WHERE token=${token} LIMIT 1000;`;
+	//console.log(ret);
+
+	let reply = `{"entries":[`;
+
+	for(let i = 0; i<ret.count;i++){
+		reply += JSON.stringify(ret[i]);
+		if(i+1<ret.count){
+			reply +=",";
+		}
+	}
+	reply += "]}";
+
+	return new Response(reply);
+
 }
 
 const server = Bun.serve({
