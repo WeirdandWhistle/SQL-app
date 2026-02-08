@@ -2,8 +2,10 @@ import {SQL, sql} from "bun";
 
 const db = new SQL("sql.db", {adapter: "sqlite"});
 
-const chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
-const idLength = 10;
+const chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`;
+const tokenLength = 10;
+const idLength = 24;
+const bannedURLs = ["192.168.2.65/r/"];
 
 function makeid(lenght){
 	let result = '';
@@ -44,39 +46,108 @@ async function redirect(req){
 
 	return res;
 }
-function make(req){
-	console.log(req);
-}
-function login(req){
-	let headers = req.headers;
+async function make(req){
+	console.log("make",req);
 
-	if(headers.get("cookie") != null){
-		return new Response("OK");
+	// {des, token}
+	let body = await req.json();
+	console.log("make body",body);
+
+	if(body.token.length != 10){
+		console.log("token_wrong_length", body.token.length);
+		return new Response(null, {status:400,statusText:"token_wrong_length"});
 	}
+	let accpeted = true;
+	for(let c in body.token){
+		if(!chars.includes(c)){
+			accpeted = false;
+			break;
+		}
+	}
+	if(!accpeted){
+		console.log("token_chars_not_allowed");
+			return new Response(null,{status:401,statusText:"token_chars_not_allowed"});
+	}
+
+	let validURL = false;
+	let url;
+
+	try {
+		url = new URL(body.des);
+		if(url.protocol === "http:" || url.protocol === "https:"){
+			let inBanned = false;
+			for(let ban in bannedURLs){
+				if(url.toString().includes(ban)){
+					inBanned = true;
+					break;
+				}
+			}
+			if(!inBanned){
+				validURL = true;
+			}
+			else{
+				console.log("des_is_banned");
+				return new Response(null, {status:400, statusText:"des_is_banned"});
+			}
+		}
+	} catch{console.log("NOT VALID URL! url threw!");}
+
+	if(!validURL){
+		console.log("des_not_valid");
+		return new Response(null,{status:400,statusText:"des_not_valid"});
+	}
+
+	// {id}
+	let reply;
+
+	let inDB = true;
+	let id;
+	while(inDB){
+		id = makeid(idLength);
+		const q = await db`SELECT count FROM redirect WHERE id="${id} LIMIT 1";`.values();
+		if(q.length === 0){
+			inDB = false;
+		}
+	}
+
+	console.log(await db`INSERT INTO redirect (id, des, token, count) VALUES (${id}, ${body.des}, ${body.token}, 0);`);
+
+	reply = {des: id};
+	console.log("MAKE id",id);
+	return new Response(JSON.stringify(reply));
+
+	
+}
+async function login(req){
 	let q;
 	let loginToken;
 	let inDB = true;
 	while(inDB){
-		loginToken = makeid(idLength);
-		q = db.query(`SELECT * FROM redirect WHERE own="${loginToken}";`);
-		if(q.get() == null){
+		loginToken = makeid(tokenLength);
+		q = await db`SELECT id FROM redirect WHERE token=${loginToken} LIMIT 1;`.values();
+		console.log("login stuf",q);
+		if(q.length === 0){
 			inDB = false;
 		}
 	}
 
 	let res = new Response(null, {
 		headers: {
-			'Set-Cookie':`token=${loginToken}`
+			'Set-Cookie':`token=${loginToken}; Path=/`
 		}
 	});
 
 	return res;
+}
+async function info(req) {
+	
 }
 
 const server = Bun.serve({
 	port: 2008,
 	
 	routes: {
+		"/api/info" : req => info(req), 
 		"/api/login": req => login(req),
 		"/api/make": req => make(req),
 		"/r/*": req => redirect(req),
@@ -86,10 +157,10 @@ const server = Bun.serve({
 
 console.log(`server at ${server.url}`);
 
-// let query = db.query("CREATE TABLE IF NOT EXISTS redirect (id int, des text, own text, count int);");
+// let query = db.query("CREATE TABLE IF NOT EXISTS redirect (id int, des text, token text, count int);");
 // console.log(query.get());
 // console.log('the first statment!');
-await db`CREATE TABLE IF NOT EXISTS redirect (id int, des text, own text, count int);`;
+await db`CREATE TABLE IF NOT EXISTS redirect (id text, des text, token text, count int);`;
 // console.log('not the first statment!');
 
 // query = db.query("SELECT * FROM redirect;");
@@ -102,13 +173,13 @@ console.log(await db`SELECT * FROM redirect;`);
 const firstInsert = {
 	id:1234,
 	des:"https://dunkirk.sh",
-	own:1,
+	token:1,
 	count:0
 };
-// query = db.query("INSERT INTO redirect (id, des, own, count) VALUES (1234, 'https://dunkirk.sh', 1, 0);");
+// query = db.query("INSERT INTO redirect (id, des, token, count) VALUES (1234, 'https://dunkirk.sh', 1, 0);");
 // console.log("insert dunkirk", query.get());
 
-// console.log(await db`INSERT INTO redirect (id, des, own, count) VALUES (1234, 'https://dunkirk.sh', 1, 0);`);
+// console.log(await db`INSERT INTO redirect (id, des, token, count) VALUES ('1234', 'https://dunkirk.sh', '1', 0);`);
 // console.log(await db`SELECT * FROM redirect;`);
 
 process.on('exit', (code) => {
