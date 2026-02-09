@@ -6,6 +6,7 @@ const chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
 const tokenLength = 10;
 const idLength = 24;
 const bannedURLs = ["192.168.2.65/r/"];
+const blockedUA = ['Slackbot','Slack-ImgProxy','Applebot','facebookexternalhit','Discordbot','facebookexternalhit','Twitterbot','LinkedInBot','WhatsApp'];
 
 function makeid(lenght){
 	let result = '';
@@ -18,6 +19,15 @@ async function redirect(req){
 
 	const url = new URL(req.url);
 	console.log(req);
+
+	for(let i = 0; i<blockedUA.length; i++){
+		let UA = blockedUA[i];
+
+		if(req.headers.get("user-agent").includes(UA)){
+			console.log("user-agent blocked",req.headers.get("user-agent"));
+			return new Response("user_agent_blocked");
+		}
+	}
 
 	const pathArray = url.pathname.split("/");
 
@@ -74,12 +84,14 @@ async function make(req){
 
 	try {
 		url = new URL(body.des);
+		// console.log("URL did not throw!");
 		if(url.protocol === "http:" || url.protocol === "https:"){
+			// console.log("http true!");
 			let inBanned = false;
 			//let debug = -1;
 			for(let i = 0; i<bannedURLs.length;i++){
 				const ban = bannedURLs[i];
-				c//onsole.log(ban);
+				//console.log(ban);
 				if(url.toString().includes(ban)){
 					//debug = url.toString().indexOf(ban);
 					inBanned = true;
