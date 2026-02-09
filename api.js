@@ -87,6 +87,9 @@ async function make(req){
 		// console.log("URL did not throw!");
 		if(url.protocol === "http:" || url.protocol === "https:"){
 			// console.log("http true!");
+			
+
+
 			let inBanned = false;
 			//let debug = -1;
 			for(let i = 0; i<bannedURLs.length;i++){
@@ -105,12 +108,19 @@ async function make(req){
 				console.log("des_is_banned");
 				return new Response(null, {status:400, statusText:"des_is_banned"});
 			}
+			
 		}
 	} catch{console.log("NOT VALID URL! url threw!");}
 
 	if(!validURL){
 		console.log("des_not_valid");
 		return new Response(null,{status:400,statusText:"des_not_valid"});
+	}
+
+	let request = await fetch(url.href);
+	if(!request.ok){
+		console.log("URL did not responed!");
+		return  new Response(JSON.stringify({ok:false,error:"des_did_not_respond"}),{status:400});
 	}
 
 	// {id}
@@ -138,6 +148,7 @@ async function login(req){
 	let q;
 	let loginToken;
 	let inDB = true;
+	console.log(req);
 	while(inDB){
 		loginToken = makeid(tokenLength);
 		q = await db`SELECT id FROM redirect WHERE token=${loginToken} LIMIT 1;`.values();
