@@ -10,5 +10,5 @@ to create a new redirection:
 - The information on which links you create is stored in a cookie called `token` if you delete or loose the cookie you will no longer be able to view your link. they will still work you just cant see a dashboard with them. You could probly just go to /sql.db and look at the database your self since I haven't block it yet
 - The redirection link checks for commom web crawlers like `Slackbot`, `Applebot`, `facebookexternalhit`, `Discordbot`, `Twitterbot`, `LinkedInBot`, and `WhatsApp` and then send back a `user_agent_block` message. Its not advanced and can be spoofed easily.
 
-#Errors
+# Errors
 - If you are unable to create a link make sure that link is returning a 200 and its js Request.ok is true.
