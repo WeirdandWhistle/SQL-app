@@ -55,6 +55,7 @@ async function makeURL(){
 		method: 'POST',
 		body: JSON.stringify(send)
 	}));
+	location.reload();
 }
 function closeConfirm(){
 	confirmForum.style.display = 'none';
