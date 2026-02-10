@@ -1,6 +1,6 @@
 import {SQL, sql} from "bun";
 
-const db = new SQL("sql.db", {adapter: "sqlite"});
+const db = new SQL("/app/sql/sql.db", {adapter: "sqlite"});
 
 const chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`;
 const tokenLength = 10;
@@ -255,6 +255,7 @@ process.on('exit', (code) => {
 process.on('SIGINIT', (code) => {
   console.log(`Process exited with code: ${code}`);
   db.close();
+	procsess.exit();
 });
 
 

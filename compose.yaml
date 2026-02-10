@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build: frontend
+    ports:
+      - "80:80"
+  api:
+    build: api
+    volumes: 
+      - sql_data:/app/sql
+
+volumes:
+  sql_data:
